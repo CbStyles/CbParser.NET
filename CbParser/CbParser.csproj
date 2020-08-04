@@ -5,10 +5,25 @@
     <RootNamespace>CbStyle</RootNamespace>
     <Authors>CbStyle</Authors>
     <Company>CbStyle</Company>
+    <PackageProjectUrl>https://github.com/CbStyles/CbParser.NET</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/CbStyles/CbParser.NET.git</RepositoryUrl>
+    <RepositoryType>git</RepositoryType>
+    <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
+    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+    <PackageLicenseFile>LICENSE</PackageLicenseFile>
+    <Copyright>CbStyle</Copyright>
+    <Version>0.1.0</Version>
   </PropertyGroup>
 
   <ItemGroup>
     <PackageReference Include="FSharp.Core" Version="4.7.2" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="..\LICENSE">
+      <Pack>True</Pack>
+      <PackagePath></PackagePath>
+    </None>
   </ItemGroup>
 
 </Project>
