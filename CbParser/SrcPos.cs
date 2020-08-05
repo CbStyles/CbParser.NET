@@ -3,7 +3,7 @@ using System;
 using System.Collections;
 using System.Diagnostics;
 
-namespace CbStyle.SrcPos
+namespace CbStyles.SrcPos
 {
     [Struct]
     [CompilationMapping(SourceConstructFlags.ObjectType)]

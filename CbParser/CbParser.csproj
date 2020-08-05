@@ -2,17 +2,17 @@
 
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
-    <RootNamespace>CbStyle</RootNamespace>
-    <Authors>CbStyle</Authors>
-    <Company>CbStyle</Company>
+    <RootNamespace>CbStyles</RootNamespace>
+    <Authors>CbStyles</Authors>
+    <Company>CbStyles</Company>
     <PackageProjectUrl>https://github.com/CbStyles/CbParser.NET</PackageProjectUrl>
     <RepositoryUrl>https://github.com/CbStyles/CbParser.NET.git</RepositoryUrl>
     <RepositoryType>git</RepositoryType>
     <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     <PackageLicenseFile>LICENSE</PackageLicenseFile>
-    <Copyright>CbStyle</Copyright>
-    <Version>0.1.0</Version>
+    <Copyright>CbStyles</Copyright>
+    <Version>0.2.0</Version>
   </PropertyGroup>
 
   <ItemGroup>

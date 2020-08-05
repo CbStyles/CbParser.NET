@@ -1,11 +1,11 @@
-﻿using CbStyle.SrcPos;
+﻿using CbStyles.SrcPos;
 using Microsoft.FSharp.Core;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-namespace CbStyle.Parser
+namespace CbStyles.Parser
 {
     [CompilationMapping(SourceConstructFlags.Module)]
     public static class Reader

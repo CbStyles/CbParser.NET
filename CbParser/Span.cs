@@ -5,7 +5,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 
-namespace CbStyle.Parser
+namespace CbStyles.Parser
 {
     [Struct]
     [CustomEquality]
