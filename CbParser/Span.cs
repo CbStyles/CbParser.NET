@@ -1,8 +1,10 @@
-﻿using Microsoft.FSharp.Core;
+﻿#nullable enable
+using Microsoft.FSharp.Core;
 using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 
 namespace CbStyles.Parser
@@ -14,12 +16,12 @@ namespace CbStyles.Parser
     [Serializable]
     public struct Span<T> : IEquatable<Span<T>>, IEnumerable<T>
     {
-        T[] arr;
-        uint from;
-        uint to;
+        internal T[] arr;
+        internal uint from;
+        internal uint to;
 
         public Span(T[] arr) : this(arr, 0, (uint)arr.Length) { }
-        private Span(T[] arr, uint from, uint to)
+        internal Span(T[] arr, uint from, uint to)
         {
             this.arr = arr;
             Debug.Assert(to >= from);
@@ -33,56 +35,57 @@ namespace CbStyles.Parser
         public int RawIndex(int idx) => (int)from + idx;
         public uint RawIndex(uint idx) => from + idx;
 
-        public uint Length => to - from;
-        public int ILength => (int)Length;
+        public uint ULength => to - from;
+        public int Length => (int)ULength;
 
-        public bool IsEmpty => Length == 0;
-        public bool IsNotEmpty => Length > 0;
+        public bool IsEmpty => ULength == 0;
+        public bool IsNotEmpty => ULength > 0;
 
+        [NotNull]
         public T this[int idx]
         {
-            get => arr[RawIndex(idx)];
+            get => arr[RawIndex(idx)]!;
             set => arr[RawIndex(idx)] = value;
         }
 
+        [NotNull]
         public T this[uint idx]
         {
-            get => arr[RawIndex(idx)];
+            get => arr[RawIndex(idx)]!;
             set => arr[RawIndex(idx)] = value;
         }
 
-        public FSharpValueOption<T> Get(int idx)
+        public bool CanGet(int idx) => RawIndex(idx) < to;
+
+        public bool CanGet(uint idx) => RawIndex(idx) < to;
+
+        public FSharpValueOption<T> TryGet(int idx)
         {
-            if (RawIndex(idx) > to)
-            {
-                return FSharpValueOption<T>.ValueNone;
-            }
-            return FSharpValueOption<T>.NewValueSome(this[idx]);
-        }
-        public FSharpValueOption<T> Get(uint idx)
-        {
-            if (RawIndex(idx) > to)
-            {
-                return FSharpValueOption<T>.ValueNone;
-            }
+            if (!CanGet(idx)) return FSharpValueOption<T>.ValueNone;
             return FSharpValueOption<T>.NewValueSome(this[idx]);
         }
 
-        public bool TryGet(int idx, out T val)
+        public FSharpValueOption<T> TryGet(uint idx)
         {
-            if (RawIndex(idx) > to)
+            if (!CanGet(idx)) return FSharpValueOption<T>.ValueNone;
+            return FSharpValueOption<T>.NewValueSome(this[idx]);
+        }
+
+        public bool TryGet(int idx, [MaybeNull, NotNullWhen(true)] out T val)
+        {
+            if (!CanGet(idx))
             {
-                val = default(T);
+                val = default;
                 return false;
             }
             val = this[idx];
             return true;
         }
-        public bool TryGet(uint idx, out T val)
+        public bool TryGet(uint idx, [MaybeNull, NotNullWhen(true)] out T val)
         {
-            if (RawIndex(idx) > to)
+            if (!CanGet(idx))
             {
-                val = default(T);
+                val = default;
                 return false;
             }
             val = this[idx];
@@ -92,15 +95,32 @@ namespace CbStyles.Parser
         public Span<T> GetSlice(FSharpOption<int> start, FSharpOption<int> end)
         {
             var s = Operators.DefaultArg<int>(start, 0);
-            var e = Operators.DefaultArg<int>(end, (int)(to - from));
+            var e = Operators.DefaultArg<int>(end, Length);
+            Debug.Assert(s <= e);
             return new Span<T>(arr, from + (uint)s, from + (uint)e);
         }
 
         public Span<T> GetSlice(FSharpOption<uint> start, FSharpOption<uint> end)
         {
             var s = Operators.DefaultArg<uint>(start, 0);
-            var e = Operators.DefaultArg<uint>(end, to - from);
+            var e = Operators.DefaultArg<uint>(end, ULength);
+            Debug.Assert(s <= e);
             return new Span<T>(arr, from + s, from + e);
+        }
+
+        public Span<T> Slice(int idx, int len)
+        {
+            Debug.Assert(idx >= 0);
+            Debug.Assert(len >= idx);
+            var s = from + (uint)idx;
+            return new Span<T>(arr, s, s + (uint)len);
+        }
+
+        public Span<T> Slice(uint idx, uint len)
+        {
+            Debug.Assert(len >= idx);
+            var s = from + idx;
+            return new Span<T>(arr, s, s + len);
         }
 
         #region Eq
@@ -112,12 +132,12 @@ namespace CbStyles.Parser
             if (other is Span<T> s && Length == s.Length)
             {
                 if (Length == 0) return true;
-                return !this.Zip(s, (a, b) => (a, b)).Any(v => !v.a.Equals(v.b));
+                return !this.Zip(s, (a, b) => (a, b)).Any(v => !v.a?.Equals(v.b) ?? !v.b?.Equals(v.a) ?? true);
             } 
             else if(other is T[] a && Length == a.Length)
             {
                 if (a.Length == 0) return true;
-                return !this.Zip(a, (c, b) => (c, b)).Any(v => !v.c.Equals(v.b));
+                return !this.Zip(a, (c, b) => (c, b)).Any(v => !v.c?.Equals(v.b) ?? !v.b?.Equals(v.c) ?? true);
             }
             return false;
         }
@@ -158,7 +178,7 @@ namespace CbStyles.Parser
 
             public bool MoveNext()
             {
-                if (i >= span.Length) return false;
+                if (i >= span.ULength) return false;
                 i++;
                 return true;
             }
@@ -170,7 +190,36 @@ namespace CbStyles.Parser
 
         public override string ToString()
         {
-            return $"Span[{String.Join(", ", this.Select(v => v.ToString()))}]";
+            return $"Span[{String.Join(", ", this.Select(v => v?.ToString()))}]";
+        }
+    }
+
+    public static class SpanExtNotNull
+    {
+        public static T? Get<T>(this Span<T> self, int idx) where T : struct
+        {
+            if (!self.CanGet(idx)) return null;
+            return self[idx];
+        }
+
+        public static T? Get<T>(this Span<T> self, uint idx) where T : struct
+        {
+            if (!self.CanGet(idx)) return null;
+            return self[idx];
+        }
+    }
+    public static class SpanExtNull
+    {
+        public static T? Get<T>(this Span<T> self, int idx) where T : class
+        {
+            if (!self.CanGet(idx)) return null;
+            return self[idx];
+        }
+
+        public static T? Get<T>(this Span<T> self, uint idx) where T : class
+        {
+            if (!self.CanGet(idx)) return null;
+            return self[idx];
         }
     }
 }

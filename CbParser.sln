@@ -3,9 +3,11 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 16
 VisualStudioVersion = 16.0.30204.135
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CbParser", "CbParser\CbParser.csproj", "{0D54FD85-EA05-40C8-B069-31933C658686}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CbParser", "CbParser\CbParser.csproj", "{0D54FD85-EA05-40C8-B069-31933C658686}"
 EndProject
-Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "TestFs", "TestFs\TestFs.fsproj", "{33D78B0E-4278-4608-A722-868F830A78A1}"
+Project("{6EC3EE1D-3C4E-46DD-8F32-0CC8E7565705}") = "TestFs", "TestFs\TestFs.fsproj", "{33D78B0E-4278-4608-A722-868F830A78A1}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TestCs", "TestCs\TestCs.csproj", "{73410C89-554D-4DBE-9100-92F5EA6AC9B6}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -21,6 +23,10 @@ Global
 		{33D78B0E-4278-4608-A722-868F830A78A1}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{33D78B0E-4278-4608-A722-868F830A78A1}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{33D78B0E-4278-4608-A722-868F830A78A1}.Release|Any CPU.Build.0 = Release|Any CPU
+		{73410C89-554D-4DBE-9100-92F5EA6AC9B6}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{73410C89-554D-4DBE-9100-92F5EA6AC9B6}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{73410C89-554D-4DBE-9100-92F5EA6AC9B6}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{73410C89-554D-4DBE-9100-92F5EA6AC9B6}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
