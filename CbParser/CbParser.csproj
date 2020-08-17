@@ -1,7 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>netstandard2.1</TargetFramework>
+    <TargetFramework>netstandard2.0</TargetFramework>
     <RootNamespace>CbStyles</RootNamespace>
     <Authors>CbStyles</Authors>
     <Company>CbStyles</Company>
@@ -12,9 +12,10 @@
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     <PackageLicenseFile>LICENSE</PackageLicenseFile>
     <Copyright>CbStyles</Copyright>
-    <Version>0.3.0</Version>
+    <Version>1.0.0</Version>
     <Nullable>enable</Nullable>
     <LangVersion>8.0</LangVersion>
+    <Description>Parser utility library for CbStyles</Description>
   </PropertyGroup>
 
   <ItemGroup>

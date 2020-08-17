@@ -41,14 +41,12 @@ namespace CbStyles.Parser
         public bool IsEmpty => ULength == 0;
         public bool IsNotEmpty => ULength > 0;
 
-        [NotNull]
         public T this[int idx]
         {
             get => arr[RawIndex(idx)]!;
             set => arr[RawIndex(idx)] = value;
         }
 
-        [NotNull]
         public T this[uint idx]
         {
             get => arr[RawIndex(idx)]!;
@@ -71,7 +69,7 @@ namespace CbStyles.Parser
             return FSharpValueOption<T>.NewValueSome(this[idx]);
         }
 
-        public bool TryGet(int idx, [MaybeNull, NotNullWhen(true)] out T val)
+        public bool TryGet(int idx, out T val)
         {
             if (!CanGet(idx))
             {
@@ -81,7 +79,7 @@ namespace CbStyles.Parser
             val = this[idx];
             return true;
         }
-        public bool TryGet(uint idx, [MaybeNull, NotNullWhen(true)] out T val)
+        public bool TryGet(uint idx, out T val)
         {
             if (!CanGet(idx))
             {
