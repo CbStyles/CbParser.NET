@@ -17,11 +17,11 @@ namespace CbStyles.Parser
     public struct Span<T> : IEquatable<Span<T>>, IEnumerable<T>
     {
         internal T[] arr;
-        internal uint from;
-        internal uint to;
+        internal nuint from;
+        internal nuint to;
 
-        public Span(T[] arr) : this(arr, 0, (uint)arr.Length) { }
-        internal Span(T[] arr, uint from, uint to)
+        public Span(T[] arr) : this(arr, 0, (nuint)arr.Length) { }
+        internal Span(T[] arr, nuint from, nuint to)
         {
             this.arr = arr;
             Debug.Assert(to >= from);
@@ -30,16 +30,20 @@ namespace CbStyles.Parser
         }
 
         public T[] GetRawArr() => arr;
-        public uint RawFrom => from;
-        public uint RawTo => to;
+        public nuint RawFrom => from;
+        public nuint RawTo => to;
         public int RawIndex(int idx) => (int)from + idx;
-        public uint RawIndex(uint idx) => from + idx;
+        public uint RawIndex(uint idx) => (uint)(from + idx);
+        public nint RawIndex(nint idx) => (nint)from + idx;
+        public nuint RawIndex(nuint idx) => from + idx;
 
-        public uint ULength => to - from;
-        public int Length => (int)ULength;
-
-        public bool IsEmpty => ULength == 0;
-        public bool IsNotEmpty => ULength > 0;
+        public int Length => (int)NULength;
+        public uint ULength => (uint)NULength;
+        public nint NLength => (nint)NULength;
+        public nuint NULength => to - from;
+        
+        public bool IsEmpty => NULength == 0;
+        public bool IsNotEmpty => NULength > 0;
 
         public T this[int idx]
         {
@@ -52,10 +56,26 @@ namespace CbStyles.Parser
             get => arr[RawIndex(idx)]!;
             set => arr[RawIndex(idx)] = value;
         }
+        public T this[nint idx]
+        {
+            get => arr[RawIndex(idx)]!;
+            set => arr[RawIndex(idx)] = value;
+        }
 
-        public bool CanGet(int idx) => RawIndex(idx) < to;
+        public T this[nuint idx]
+        {
+            get => arr[RawIndex(idx)]!;
+            set => arr[RawIndex(idx)] = value;
+        }
 
-        public bool CanGet(uint idx) => RawIndex(idx) < to;
+        public bool CanGet(int idx) => CanGet((nuint)idx);
+
+        public bool CanGet(uint idx) => CanGet((nuint)idx);
+
+        public bool CanGet(nint idx) => CanGet((nuint)idx);
+
+        public bool CanGet(nuint idx) => RawIndex(idx) < to;
+
 
         public FSharpValueOption<T> TryGet(int idx)
         {
@@ -69,11 +89,25 @@ namespace CbStyles.Parser
             return FSharpValueOption<T>.NewValueSome(this[idx]);
         }
 
+        public FSharpValueOption<T> TryGet(nint idx)
+        {
+            if (!CanGet(idx)) return FSharpValueOption<T>.ValueNone;
+            return FSharpValueOption<T>.NewValueSome(this[idx]);
+        }
+
+        public FSharpValueOption<T> TryGet(nuint idx)
+        {
+            if (!CanGet(idx)) return FSharpValueOption<T>.ValueNone;
+            return FSharpValueOption<T>.NewValueSome(this[idx]);
+        }
+
         public bool TryGet(int idx, out T val)
         {
             if (!CanGet(idx))
             {
+#pragma warning disable CS8601 // 可能的 null 引用赋值。
                 val = default;
+#pragma warning restore CS8601 // 可能的 null 引用赋值。
                 return false;
             }
             val = this[idx];
@@ -83,7 +117,33 @@ namespace CbStyles.Parser
         {
             if (!CanGet(idx))
             {
+#pragma warning disable CS8601 // 可能的 null 引用赋值。
                 val = default;
+#pragma warning restore CS8601 // 可能的 null 引用赋值。
+                return false;
+            }
+            val = this[idx];
+            return true;
+        }
+        public bool TryGet(nint idx, out T val)
+        {
+            if (!CanGet(idx))
+            {
+#pragma warning disable CS8601 // 可能的 null 引用赋值。
+                val = default;
+#pragma warning restore CS8601 // 可能的 null 引用赋值。
+                return false;
+            }
+            val = this[idx];
+            return true;
+        }
+        public bool TryGet(nuint idx, out T val)
+        {
+            if (!CanGet(idx))
+            {
+#pragma warning disable CS8601 // 可能的 null 引用赋值。
+                val = default;
+#pragma warning restore CS8601 // 可能的 null 引用赋值。
                 return false;
             }
             val = this[idx];
@@ -92,8 +152,8 @@ namespace CbStyles.Parser
 
         public Span<T> GetSlice(FSharpOption<int> start, FSharpOption<int> end)
         {
-            var s = Operators.DefaultArg<int>(start, 0);
-            var e = Operators.DefaultArg<int>(end, Length);
+            var s = Operators.DefaultArg(start, 0);
+            var e = Operators.DefaultArg(end, Length);
             Debug.Assert(s <= e);
             return new Span<T>(arr, from + (uint)s, from + (uint)e);
         }
@@ -101,7 +161,23 @@ namespace CbStyles.Parser
         public Span<T> GetSlice(FSharpOption<uint> start, FSharpOption<uint> end)
         {
             var s = Operators.DefaultArg<uint>(start, 0);
-            var e = Operators.DefaultArg<uint>(end, ULength);
+            var e = Operators.DefaultArg(end, ULength);
+            Debug.Assert(s <= e);
+            return new Span<T>(arr, from + s, from + e);
+        }
+
+        public Span<T> GetSlice(FSharpOption<nint> start, FSharpOption<nint> end)
+        {
+            var s = Operators.DefaultArg(start, 0);
+            var e = Operators.DefaultArg(end, Length);
+            Debug.Assert(s <= e);
+            return new Span<T>(arr, from + (uint)s, from + (uint)e);
+        }
+
+        public Span<T> GetSlice(FSharpOption<nuint> start, FSharpOption<nuint> end)
+        {
+            var s = Operators.DefaultArg<nuint>(start, 0);
+            var e = Operators.DefaultArg(end, ULength);
             Debug.Assert(s <= e);
             return new Span<T>(arr, from + s, from + e);
         }
@@ -110,11 +186,23 @@ namespace CbStyles.Parser
         {
             Debug.Assert(idx >= 0);
             Debug.Assert(len >= idx);
-            var s = from + (uint)idx;
-            return new Span<T>(arr, s, s + (uint)len);
+            var s = from + (nuint)idx;
+            return new Span<T>(arr, s, s + (nuint)len);
         }
-
         public Span<T> Slice(uint idx, uint len)
+        {
+            Debug.Assert(len >= idx);
+            var s = from + idx;
+            return new Span<T>(arr, s, s + len);
+        }
+        public Span<T> Slice(nint idx, nint len)
+        {
+            Debug.Assert(idx >= 0);
+            Debug.Assert(len >= idx);
+            var s = from + (nuint)idx;
+            return new Span<T>(arr, s, s + (nuint)len);
+        }
+        public Span<T> Slice(nuint idx, nuint len)
         {
             Debug.Assert(len >= idx);
             var s = from + idx;
@@ -123,13 +211,15 @@ namespace CbStyles.Parser
 
         #region Eq
 
+#pragma warning disable CS8765 // 参数类型的为 Null 性与重写成员不匹配(可能是由于为 Null 性特性)。
         public override bool Equals(object obj) => obj is Span<T> span && Equals(span);
+#pragma warning restore CS8765 // 参数类型的为 Null 性与重写成员不匹配(可能是由于为 Null 性特性)。
 
         public bool Equals(Span<T> other)
         {
-            if (other is Span<T> s && Length == s.Length)
+            if (other is Span<T> s && NULength == s.NULength)
             {
-                if (Length == 0) return true;
+                if (NULength == 0) return true;
                 return !this.Zip(s, (a, b) => (a, b)).Any(v => !v.a?.Equals(v.b) ?? !v.b?.Equals(v.a) ?? true);
             } 
             else if(other is T[] a && Length == a.Length)
@@ -161,7 +251,7 @@ namespace CbStyles.Parser
         private class SpanIter : IEnumerator<T>
         {
             Span<T> span;
-            uint i = 0;
+            nuint i = 0;
 
             public SpanIter(Span<T> span)
             {
@@ -170,13 +260,15 @@ namespace CbStyles.Parser
 
             public T Current => span[i - 1];
 
+#pragma warning disable CS8603 // 可能的 null 引用返回。
             object IEnumerator.Current => span[i - 1];
+#pragma warning restore CS8603 // 可能的 null 引用返回。
 
             public void Dispose() { }
 
             public bool MoveNext()
             {
-                if (i >= span.ULength) return false;
+                if (i >= span.NULength) return false;
                 i++;
                 return true;
             }
@@ -188,7 +280,7 @@ namespace CbStyles.Parser
 
         public override string ToString()
         {
-            return $"Span[{String.Join(", ", this.Select(v => v?.ToString()))}]";
+            return $"Span[{string.Join(", ", this.Select(v => v?.ToString()))}]";
         }
     }
 
@@ -205,6 +297,18 @@ namespace CbStyles.Parser
             if (!self.CanGet(idx)) return null;
             return self[idx];
         }
+
+        public static T? Get<T>(this Span<T> self, nint idx) where T : struct
+        {
+            if (!self.CanGet(idx)) return null;
+            return self[idx];
+        }
+
+        public static T? Get<T>(this Span<T> self, nuint idx) where T : struct
+        {
+            if (!self.CanGet(idx)) return null;
+            return self[idx];
+        }
     }
     public static class SpanExtNull
     {
@@ -215,6 +319,18 @@ namespace CbStyles.Parser
         }
 
         public static T? Get<T>(this Span<T> self, uint idx) where T : class
+        {
+            if (!self.CanGet(idx)) return null;
+            return self[idx];
+        }
+
+        public static T? Get<T>(this Span<T> self, nint idx) where T : class
+        {
+            if (!self.CanGet(idx)) return null;
+            return self[idx];
+        }
+
+        public static T? Get<T>(this Span<T> self, nuint idx) where T : class
         {
             if (!self.CanGet(idx)) return null;
             return self[idx];

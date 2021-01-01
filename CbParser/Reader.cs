@@ -3,7 +3,6 @@ using Microsoft.FSharp.Core;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 
 namespace CbStyles.Parser
 {
@@ -12,9 +11,9 @@ namespace CbStyles.Parser
     {
         public static Span<char> reader<a>(a code) where a : IEnumerable<char>
         {
-            var r = false;
-            IEnumerable<char> f()
+            static IEnumerable<char> f(a code)
             {
+                var r = false;
                 foreach (var c in code)
                 {
                     if (c == '\r')
@@ -34,16 +33,16 @@ namespace CbStyles.Parser
                     }
                 }
             }
-            return new Span<char>(f().ToArray());
+            return new Span<char>(f(code).ToArray());
         }
 
         public static Span<(Pos, char)> readerPos<a>(a code) where a : IEnumerable<char>
         {
-            var r = false;
-            var line = 0u;
-            var column = 0u;
-            IEnumerable<(Pos, char)> f()
+            static IEnumerable<(Pos, char)> f(a code)
             {
+                var r = false;
+                nuint line = 0;
+                nuint column = 0;
                 foreach (var c in code)
                 {
                     if (c == '\r')
@@ -71,14 +70,14 @@ namespace CbStyles.Parser
                     }
                 }
             }
-            return new Span<(Pos, char)>(f().ToArray());
+            return new Span<(Pos, char)>(f(code).ToArray());
         }
 
         public static (Span<Pos>, Span<char>) readerPos2<a>(a code) where a : IEnumerable<char>
         {
             var r = false;
-            var line = 0u;
-            var column = 0u;
+            nuint line = 0;
+            nuint column = 0;
             var poss = new List<Pos>();
             var chars = new List<char>();
             foreach (var c in code)

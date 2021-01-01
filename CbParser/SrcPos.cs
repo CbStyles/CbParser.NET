@@ -10,14 +10,16 @@ namespace CbStyles.SrcPos
     [Serializable]
     public struct Pos : IEquatable<Pos>, IStructuralEquatable, IComparable<Pos>, IComparable, IStructuralComparable
     {
-        public uint line;
-        public uint column;
+        public nuint line;
+        public nuint column;
 
-        public Pos(uint line, uint column)
+        public Pos(nuint line, nuint column)
         {
             this.line = line;
             this.column = column;
         }
+
+
 
         #region Eq
 
